@@ -4,11 +4,7 @@
 node_modules/
 platforms/
 plugins/
-
-
-.idea
-hooks
-platforms
-plugins
-resources
-www/lib
+.idea/
+hooks/
+resources/
+www/lib/
