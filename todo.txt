@@ -1,0 +1,4 @@
+1. Make a call to login -> send server username and deviceId and the token
+2. Token - polling request, every hour or so to update the key during 
+3. Authentication call - send username, deviceId, token, only if questions are answered
+4. If incorrect, lock account for next 20 min.

@@ -1,6 +1,6 @@
 angular.module('controllers', ['services', 'ngCordova'])
 
-  .controller('LoginCtrl', function ($rootScope, $scope, $http, $q, CallLogService, $ionicPlatform, $cordovaDevice, $ionicPopup, $cordovaCalendar) {
+  .controller('LoginCtrl', function ($rootScope, $scope, $http, $q, CallLogService, $ionicPlatform, $cordovaDevice, $ionicPopup, $cordovaCalendar, AuthenticationService) {
     $scope.showLogin = true;
     $scope.user = {name: ""};
     $scope.authenticationResult = "Success";
@@ -10,6 +10,7 @@ angular.module('controllers', ['services', 'ngCordova'])
     $scope.questions = [];
     $scope.calendars = [];
     $scope.attempts = 3;
+
     $scope.dbQuestions = [
       {
         id: 1,
@@ -76,10 +77,13 @@ angular.module('controllers', ['services', 'ngCordova'])
     };
 
     $scope.getAccountInformation = function () {
-      //$http.get()
+      AuthenticationService.getKey($scope.user.name, $scope.deviceId).then(function(key) {
+
+        $scope.showLogin = false;
+        $rootScope.key = key.data['key'];
+      });
       //will return me secret key and random questions
       //call to Shreya's backend
-      $scope.showLogin = false;
 
 
       var indexes = [0, 1, 2, 3, 4];
@@ -177,8 +181,17 @@ angular.module('controllers', ['services', 'ngCordova'])
           }
 
         } else {
-          $scope.authenticationResult = "Success";
-          $scope.authenticationMessage = "You have been successfully authenticated";
+          AuthenticationService.authenticateUser($scope.user.name, $scope.deviceId, $rootScope.key.then(function(success) {
+            if(success.data['success']) {
+              $scope.authenticationResult = "Success";
+              $scope.authenticationMessage = "You have been successfully authenticated";
+            }
+
+          }, function(err) {
+            $scope.authenticationResult = "Failure";
+            $scope.authenticationMessage = "You failed to authenticate!";
+          }));
+
         }
 
         $scope.showAlert();
@@ -233,15 +246,8 @@ angular.module('controllers', ['services', 'ngCordova'])
           console.log("Error calling Installed Apps Plugin");
         });
 
-        console.log($cordovaDevice.getDevice());
 
-        console.log("Cordova: " + $cordovaDevice.getCordova());
-
-        console.log("Model: " + $cordovaDevice.getModel());
-
-        console.log("Platform: " + $cordovaDevice.getPlatform());
-
-        console.log("Version: " + $cordovaDevice.getVersion());
+        $scope.deviceId = $cordovaDevice.getUUID();
 
         window.addEventListener("batterystatus", function onBatteryStatus(info) {
           $scope.batteryInfo = {level: info.level, isPlugged: info.isPlugged};
@@ -260,6 +266,15 @@ angular.module('controllers', ['services', 'ngCordova'])
            number: "9087529619"
            type: 2*/
         })
+
+        setInterval(function () {
+          if($scope.user.name) {
+            AuthenticationService.getKey($scope.user.name, $scope.deviceId).then(function(key) {
+              $rootScope.key = key.data['key'];
+            })
+          }
+
+        }, 60000);
       });
     }
 
