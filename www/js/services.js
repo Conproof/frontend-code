@@ -2,15 +2,15 @@ angular.module('services', [])
   .factory('AuthenticationService', function($http) {
     return {
       getKey: function(userId, deviceId) {
-        return $http.get('url', {
+        return $http.get('http://192.168.1.5:3000/pkey', {
           params: {
             userId: userId,
             deviceId: deviceId
           }
         });
       },
-      initiateLogin: function(userId, deviceId, token) {
-        return $http.post('url', {
+      login: function(userId, deviceId, token) {
+        return $http.get('http://192.168.1.5:3000/login', {
           params: {
             userId: userId,
             deviceId: deviceId,

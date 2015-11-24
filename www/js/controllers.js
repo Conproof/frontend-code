@@ -77,11 +77,15 @@ angular.module('controllers', ['services', 'ngCordova'])
     };
 
     $scope.getAccountInformation = function () {
-      AuthenticationService.getKey($scope.user.name, $scope.deviceId).then(function(key) {
+      if(!$rootScope.key) {
+        AuthenticationService.getKey($scope.user.name, $scope.deviceId).then(function (key) {
 
+          $scope.showLogin = false;
+          $rootScope.key = key.data['pkey'];
+        });
+      } else {
         $scope.showLogin = false;
-        $rootScope.key = key.data['key'];
-      });
+      }
       //will return me secret key and random questions
       //call to Shreya's backend
 
@@ -180,24 +184,29 @@ angular.module('controllers', ['services', 'ngCordova'])
             $scope.authenticationMessage = "You have " + $scope.attempts + " tries left.";
           }
 
+          $scope.showAlert();
+
         } else {
-          AuthenticationService.authenticateUser($scope.user.name, $scope.deviceId, $rootScope.key.then(function(success) {
-            if(success.data['success']) {
+          AuthenticationService.login($scope.user.name, $scope.deviceId, $rootScope.key).then(function(success) {
+            if(success.data['status'].toUpperCase() === 'SUCCESS') {
               $scope.authenticationResult = "Success";
               $scope.authenticationMessage = "You have been successfully authenticated";
+            } else {
+              $scope.authenticationResult = "Failure";
+              $scope.authenticationMessage = "Key does not match";
             }
+
+            $scope.showAlert();
 
           }, function(err) {
             $scope.authenticationResult = "Failure";
             $scope.authenticationMessage = "You failed to authenticate!";
-          }));
+            $scope.showAlert();
+          });
 
         }
 
-        $scope.showAlert();
       }
-      //$http.post();
-      //send information back
     };
 
 
