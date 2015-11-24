@@ -81,7 +81,7 @@ angular.module('controllers', ['services', 'ngCordova'])
         AuthenticationService.getKey($scope.user.name, $scope.deviceId).then(function (key) {
 
           $scope.showLogin = false;
-          $rootScope.key = key.data['pkey'];
+          $rootScope.key = key.data['result'];
         });
       } else {
         $scope.showLogin = false;
