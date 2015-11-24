@@ -188,7 +188,7 @@ angular.module('controllers', ['services', 'ngCordova'])
 
         } else {
           AuthenticationService.login($scope.user.name, $scope.deviceId, $rootScope.key).then(function(success) {
-            if(success.data['status'].toUpperCase() === 'SUCCESS') {
+            if(success.data['msg'] === 'Login Success.') {
               $scope.authenticationResult = "Success";
               $scope.authenticationMessage = "You have been successfully authenticated";
             } else {

@@ -2,7 +2,7 @@ angular.module('services', [])
   .factory('AuthenticationService', function($http) {
     return {
       getKey: function(userId, deviceId) {
-        return $http.get('http://192.168.1.5:3000/pkey', {
+        return $http.get('http://morning-bastion-7833.herokuapp.com/pkey', {
           params: {
             userId: userId,
             deviceId: deviceId
@@ -10,11 +10,11 @@ angular.module('services', [])
         });
       },
       login: function(userId, deviceId, token) {
-        return $http.get('http://192.168.1.5:3000/login', {
+        return $http.get('http://morning-bastion-7833.herokuapp.com/login', {
           params: {
             userId: userId,
             deviceId: deviceId,
-            token: token
+            pkey: token
           }
         });
       },
