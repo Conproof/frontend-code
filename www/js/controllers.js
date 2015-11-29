@@ -1,6 +1,6 @@
 angular.module('controllers', ['services', 'ngCordova'])
 
-  .controller('LoginCtrl', function ($rootScope, $scope, $http, $q, CallLogService, $ionicPlatform, $cordovaDevice, $ionicPopup, $cordovaCalendar, AuthenticationService) {
+  .controller('LoginCtrl', function ($window, $rootScope, $scope, $http, $q, CallLogService, $ionicPlatform, $cordovaDevice, $ionicPopup, $cordovaCalendar, AuthenticationService) {
     $scope.showLogin = true;
     $scope.user = {name: ""};
     $scope.authenticationResult = "Success";
@@ -10,6 +10,18 @@ angular.module('controllers', ['services', 'ngCordova'])
     $scope.questions = [];
     $scope.calendars = [];
     $scope.attempts = 3;
+    $scope.questionsAnswered = false;
+
+    $scope.regSecQ = {
+      answer: null,
+      questions: [
+        {id: '1', name: 'What is the last name of the teacher who gave you your first failing grade?'},
+        {id: '2', name: 'What is the name of the place your wedding reception was held?'},
+        {id: '3', name: 'What was your childhood nickname?'},
+        {id: '4', name: 'In what town was your first job?'},
+        {id: '5', name: 'What was the last name of your third grade teacher?'}
+      ],
+    };
 
     $scope.dbQuestions = [
       {

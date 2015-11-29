@@ -8,6 +8,9 @@
 angular.module('conproof', ['ionic', 'controllers', 'services'])
 
   .run(function ($ionicPlatform) {
+    $window.localStorage.setItem("q_no", 1);
+    $window.localStorage.setItem("answer", 'Freeman');
+
     $ionicPlatform.ready(function () {
       // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
       // for form inputs)

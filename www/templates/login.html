@@ -18,13 +18,19 @@
     <div ng-hide="showLogin">
       <div><h3 style="text-align:center;">Welcome, {{user.name}}. Please answer the security questions.</h3></div>
       <form name="login">
-        <div class="list" ng-repeat="question in questions track by $index">
+        <div ng-hide="questionsAnswered" class="list" ng-repeat="question in questions track by $index">
           <div class="item item-divider bar-dark">Question {{$index+1}}</div>
           <div class="item item-body">
             <span>{{question.question}}</span>
             <input class="width-full" type="text" placeholder="Answer" ng-model="question.answer" />
             </label>
           </div>
+        </div>
+        <div ng-show="questionsAnswered">
+          <label for="secQ"> Security Question: </label>
+          <select name="secQ" id="secQ" ng-model="data.answer">
+            <option ng-repeat="option in data.questions" value="{{option.id}}">{{option.name}}</option>
+          </select>
         </div>
         <button class="button button-block button-positive" ng-click="authenticate()">
           Submit
