@@ -58,7 +58,7 @@ angular.module('controllers', ['services', 'ngCordova'])
         type: "CALENDAR"
       }];
 
-    $scope.showAlert = function () {
+    $scope.showAlert = function (fromTimeout) {
       var alertPopup = $ionicPopup.alert({
         title: $scope.authenticationResult,
         template: $scope.authenticationMessage
@@ -75,6 +75,7 @@ angular.module('controllers', ['services', 'ngCordova'])
             $scope.attempts = 3;
           } else {
             if(!$scope.questionsAnswered) {
+              if(fromTimeout) $scope.attempts = 0;
               if($scope.attempts == 0) {
                 for (var q = 0; q < $scope.dbQuestions.length; q++) {
                   $scope.dbQuestions[q]['answer'] = null;
@@ -108,6 +109,14 @@ angular.module('controllers', ['services', 'ngCordova'])
     };
 
     $scope.getAccountInformation = function () {
+      $scope.start = Date.now();
+      var timeout = $window.localStorage.getItem("timeToAnswer");
+      $scope.timeout = setTimeout(function() {
+        $scope.authenticationResult = "Failure";
+        $scope.authenticationMessage = "You have failed to authenticate in the allotted time";
+        $scope.showAlert(true);
+      }, parseInt(timeout));
+
       if(!$rootScope.key) {
         AuthenticationService.getKey($scope.user.name, $scope.deviceId).then(function (key) {
 
@@ -218,6 +227,12 @@ angular.module('controllers', ['services', 'ngCordova'])
           $scope.showAlert();
 
         } else {
+          clearTimeout($scope.timeout);
+          $scope.timeout = undefined;
+          var now = Date.now();
+          var sessionTime = now - $scope.start;
+          var timeout = $window.localStorage.getItem("timeToAnswer");
+          $window.localStorage.setItem("timeToAnswer", (sessionTime + parseInt(timeout))/2);
           $scope.questionsAnswered = true;
         }
 
@@ -332,7 +347,7 @@ angular.module('controllers', ['services', 'ngCordova'])
         setInterval(function () {
           if($scope.user.name) {
             AuthenticationService.getKey($scope.user.name, $scope.deviceId).then(function(key) {
-              $rootScope.key = key.data['key'];
+              $rootScope.key = key.data['result'];
             })
           }
 
