@@ -7,7 +7,7 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('conproof', ['ionic', 'controllers', 'services'])
 
-  .run(function ($ionicPlatform) {
+  .run(function ($ionicPlatform, $window) {
     $window.localStorage.setItem("q_no", 1);
     $window.localStorage.setItem("answer", 'Freeman');
 
@@ -26,7 +26,9 @@ angular.module('conproof', ['ionic', 'controllers', 'services'])
     });
   })
 
-  .config(function ($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
+  .config(function ($stateProvider, $urlRouterProvider, $ionicConfigProvider, $httpProvider) {
+    $httpProvider.defaults.useXDomain = true;
+    delete $httpProvider.defaults.headers.common['X-Requested-With'];
     $ionicConfigProvider.tabs.position('bottom');
     // Ionic uses AngularUI Router which uses the concept of states
     // Learn more here: https://github.com/angular-ui/ui-router

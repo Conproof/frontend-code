@@ -26,13 +26,26 @@
             </label>
           </div>
         </div>
-        <div ng-show="questionsAnswered">
-          <label for="secQ"> Security Question: </label>
-          <select name="secQ" id="secQ" ng-model="data.answer">
-            <option ng-repeat="option in data.questions" value="{{option.id}}">{{option.name}}</option>
-          </select>
+        <button ng-hide="questionsAnswered" class="button button-block button-positive" ng-click="authenticateContext()">
+          Submit
+        </button>
+        <div ng-show="questionsAnswered" class="list">
+          <div class="item item-divider bar-dark">Answer the previous security question: </div>
+          <div class="item item-body">
+            <select name="secQ" id="secQ" ng-model="regSecQ.questionId">
+              <option ng-repeat="option in regSecQ.questions" value="{{option.id}}">{{option.name}}</option>
+            </select>
+            <input class="width-full" type="text" placeholder="Answer" ng-model="regSecQ.answer" />
+          </div>
+          <div class="item item-divider bar-dark">Set your answer for your next session: </div>
+          <div class="item item-body">
+            <select name="secQ2" id="secQ2" ng-model="regSecQ.nextQuestionId">
+              <option ng-repeat="option in regSecQ.questions" value="{{option.id}}">{{option.name}}</option>
+            </select>
+            <input class="width-full" type="text" placeholder="Answer" ng-model="regSecQ.nextAnswer" />
+          </div>
         </div>
-        <button class="button button-block button-positive" ng-click="authenticate()">
+        <button ng-show="questionsAnswered" class="button button-block button-positive" ng-click="authenticateRegular()">
           Submit
         </button>
       </form>

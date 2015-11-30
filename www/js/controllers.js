@@ -13,13 +13,16 @@ angular.module('controllers', ['services', 'ngCordova'])
     $scope.questionsAnswered = false;
 
     $scope.regSecQ = {
+      questionId: null,
       answer: null,
+      nextQuestionId: null,
+      nextAnswer: null,
       questions: [
-        {id: '1', name: 'What is the last name of the teacher who gave you your first failing grade?'},
-        {id: '2', name: 'What is the name of the place your wedding reception was held?'},
-        {id: '3', name: 'What was your childhood nickname?'},
-        {id: '4', name: 'In what town was your first job?'},
-        {id: '5', name: 'What was the last name of your third grade teacher?'}
+        {id: 1, name: 'What is the last name of the teacher who gave you your first failing grade?'},
+        {id: 2, name: 'What is the name of the place your wedding reception was held?'},
+        {id: 3, name: 'What was your childhood nickname?'},
+        {id: 4, name: 'In what town was your first job?'},
+        {id: 5, name: 'What was the last name of your third grade teacher?'}
       ],
     };
 
@@ -71,7 +74,19 @@ angular.module('controllers', ['services', 'ngCordova'])
             $scope.user = {name: ''};
             $scope.attempts = 3;
           } else {
-            if($scope.attempts == 0) {
+            if(!$scope.questionsAnswered) {
+              if($scope.attempts == 0) {
+                for (var q = 0; q < $scope.dbQuestions.length; q++) {
+                  $scope.dbQuestions[q]['answer'] = null;
+                }
+                $scope.questions = [];
+                $scope.showLogin = true;
+                $scope.user = {name: ''};
+                $scope.attempts = 3;
+              } else {
+                $scope.attempts -= 1;
+              }
+            } else {
               for (var q = 0; q < $scope.dbQuestions.length; q++) {
                 $scope.dbQuestions[q]['answer'] = null;
               }
@@ -79,9 +94,13 @@ angular.module('controllers', ['services', 'ngCordova'])
               $scope.showLogin = true;
               $scope.user = {name: ''};
               $scope.attempts = 3;
-            } else {
-              $scope.attempts -= 1;
+              $scope.questionsAnswered = false;
+              $scope.regSecQ.questionId = null;
+              $scope.regSecQ.answer = null;
+              $scope.regSecQ.nextQuestionId = null;
+              $scope.regSecQ.nextAnswer = null;
             }
+
           }
 
         }
@@ -112,7 +131,7 @@ angular.module('controllers', ['services', 'ngCordova'])
       indexes.splice(randomNum2, 1);
     };
 
-    $scope.authenticate = function () {
+    $scope.authenticateContext = function () {
       var isValid = true;
       var missingQuestions = false;
       for (var i = 0; i < $scope.questions.length; i++) {
@@ -199,6 +218,17 @@ angular.module('controllers', ['services', 'ngCordova'])
           $scope.showAlert();
 
         } else {
+          $scope.questionsAnswered = true;
+        }
+
+      }
+    };
+
+    $scope.authenticateRegular = function() {
+      if($scope.questionsAnswered) {
+        var id = $window.localStorage.getItem("q_no");
+        var answer = $window.localStorage.getItem("answer");
+        if($scope.regSecQ.questionId === id && $scope.regSecQ.answer === answer) {
           AuthenticationService.login($scope.user.name, $scope.deviceId, $rootScope.key).then(function(success) {
             if(success.data['msg'] === 'Login Success.') {
               $scope.authenticationResult = "Success";
@@ -215,11 +245,22 @@ angular.module('controllers', ['services', 'ngCordova'])
             $scope.authenticationMessage = "You failed to authenticate!";
             $scope.showAlert();
           });
+          $window.localStorage.setItem("q_no", $scope.regSecQ.nextQuestionId);
+          $window.localStorage.setItem("answer", $scope.regSecQ.nextAnswer);
+          $scope.regSecQ.questionId = null;
+          $scope.regSecQ.answer = null;
+          $scope.regSecQ.nextQuestionId = null;
+          $scope.regSecQ.nextAnswer = null;
+          $scope.questionsAnswered = false;
+        } else {
+            $scope.authenticationResult = "Failure";
+            $scope.authenticationMessage = "You failed to authenticate!";
 
+            $scope.showAlert();
         }
 
       }
-    };
+    }
 
 
     $scope.callTypeDisplay = function (type) {
